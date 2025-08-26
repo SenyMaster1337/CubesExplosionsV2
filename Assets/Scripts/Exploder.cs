@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Exploder : MonoBehaviour
@@ -8,7 +7,7 @@ public class Exploder : MonoBehaviour
     [SerializeField] private float _explosionForce;
     [SerializeField] private ParticleSystem _effect;
 
-    public void Explode(Vector3 position, Vector3 scale = default)
+    public void Explode(Vector3 position, Vector3 scale = default, List<Rigidbody> cubesToExplode = default)
     {
         float forceUp = 0;
         float radiusUp = 0;
@@ -18,14 +17,31 @@ public class Exploder : MonoBehaviour
         {
             forceUp = (_explosionForce / scale.x) * coefficientNumber;
             radiusUp = (_explosionRadius / scale.x) * coefficientNumber;
-            Instantiate(_effect, position, transform.rotation);
-        }
 
-        foreach (Rigidbody explodableObject in GetExplodableObjects(position))
-            explodableObject.AddExplosionForce(_explosionForce + forceUp, position, _explosionRadius + radiusUp);
+            Instantiate(_effect, position, transform.rotation);
+            SimulateExplosion(GetExplodableObjects(position), position, _explosionForce + forceUp, _explosionRadius + radiusUp);
+        }
+        else
+        {
+            SimulateExplosion(cubesToExplode, position, _explosionForce, _explosionRadius);
+
+            foreach (Rigidbody cubeToExplode in cubesToExplode)
+            {
+                Debug.Log(cubeToExplode);
+            }
+        }
 
         Debug.Log($"Радиус {_explosionRadius + radiusUp}");
         Debug.Log($"Сила {_explosionForce + forceUp}");
+    }
+
+    private void SimulateExplosion(List<Rigidbody> cubes, Vector3 position, float forceValue, float radiusValue)
+    {
+        foreach (Rigidbody explodableObject in cubes)
+        {
+            if (explodableObject != null)
+            explodableObject.AddExplosionForce(forceValue, position, radiusValue);
+        }
     }
 
     private List<Rigidbody> GetExplodableObjects(Vector3 position)

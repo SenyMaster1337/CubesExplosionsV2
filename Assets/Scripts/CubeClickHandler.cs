@@ -6,9 +6,8 @@ public class CubeClickHandler : MonoBehaviour
     [SerializeField] private CubesSpawner _cubesSpawner;
     [SerializeField] private Exploder _exploder;
 
-    private int _minPercentageValue = 50;
-    private int _maxPercentageValue = 100;
-    private int _number = 2;
+    private float _minPercentageValue = 0.0f;
+    private float _maxPercentageValue = 100.0f;
 
     private void OnEnable()
     {
@@ -20,15 +19,14 @@ public class CubeClickHandler : MonoBehaviour
         _rayReader.CubeClicked -= Handle;
     }
 
-    private void Handle(Vector3 position, Vector3 scale)
+    private void Handle(Cube cube, Vector3 position, Vector3 scale)
     {
-        if (GetBooleanValue(UnityEngine.Random.Range(0, _maxPercentageValue)))
-        {
-            _cubesSpawner.Spawn(position, scale);
-            _exploder.Explode(position);
+        Debug.Log(cube.GetChanceSplitValue);
 
-            _minPercentageValue /= _number;
-            _maxPercentageValue /= _number;
+        if (IsPossibleSplitCube(cube.GetChanceSplitValue))
+        {
+            _cubesSpawner.Spawn(cube, position, scale);
+            _exploder.Explode(position, default, _cubesSpawner.GetCubesToExplode());
         }
         else
         {
@@ -36,8 +34,9 @@ public class CubeClickHandler : MonoBehaviour
         }
     }
 
-    private bool GetBooleanValue(int percentageValue)
+    private bool IsPossibleSplitCube(float chanceValue)
     {
-        return percentageValue > _minPercentageValue;
+        Debug.Log(chanceValue);
+        return chanceValue >= UnityEngine.Random.Range(_minPercentageValue, _maxPercentageValue);
     }
 }

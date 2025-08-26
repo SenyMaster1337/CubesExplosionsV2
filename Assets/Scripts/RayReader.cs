@@ -10,7 +10,7 @@ public class RayReader : MonoBehaviour
 
     private int _positionZ = 1;
 
-    public event Action<Vector3, Vector3> CubeClicked;
+    public event Action<Cube, Vector3, Vector3> CubeClicked;
 
     private void OnEnable()
     {
@@ -30,8 +30,7 @@ public class RayReader : MonoBehaviour
         {
             if (_hit.collider.TryGetComponent(out Cube cube))
             {
-                CubeClicked.Invoke(_hit.collider.transform.position, _hit.collider.transform.localScale);
-                Destroy(_hit.collider.gameObject);
+                CubeClicked.Invoke(cube, _hit.collider.transform.position, _hit.collider.transform.localScale);
             }
         }
     }

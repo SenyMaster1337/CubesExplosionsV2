@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public class CubesSpawner : MonoBehaviour
@@ -7,16 +9,29 @@ public class CubesSpawner : MonoBehaviour
 
     private int _minCubesCount = 2;
     private int _maxCubesCount = 6;
-    private int _number = 2;
+    private int _cubeReductionValue = 2;
 
-    public void Spawn(Vector3 position, Vector3 scale)
+    private List<Rigidbody> _cubesRigidbody = new List<Rigidbody>();
+
+    public void Spawn(Cube cube, Vector3 position, Vector3 scale)
     {
         for (int i = 0; i < GetCubesCount(); i++)
         {
             var cloneCube = Instantiate(_cube, position, transform.rotation);
-            cloneCube.transform.localScale = scale / _number;
+            cloneCube.ChangeChanceSplitValue(cube.GetChanceSplitValue);
+            cloneCube.transform.localScale = scale / _cubeReductionValue;
             _colorChanger.SetMaterial(cloneCube.GetComponent<Renderer>());
+
+            _cubesRigidbody.Add(cloneCube.GetComponent<Rigidbody>());
+            Debug.Log(cube.GetChanceSplitValue);
         }
+
+        Destroy(cube.transform.gameObject);
+    }
+
+    public List<Rigidbody> GetCubesToExplode()
+    {
+        return new List<Rigidbody>(_cubesRigidbody);
     }
 
     private int GetCubesCount()
